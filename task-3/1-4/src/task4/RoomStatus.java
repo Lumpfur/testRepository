@@ -1,10 +1,10 @@
 package task4;
 
 public enum RoomStatus {
-    AVAILABLE("Free"),
-    OCCUPIED("Booked"),
-    UNDER_MAINTENANCE("Tech-support"),
-    UNDER_SERVICE("Service-support");
+    AVAILABLE("Available"),
+    OCCUPIED("Occupied"),
+    UNDER_MAINTENANCE("Under Maintenance"),
+    UNDER_SERVICE("Under Service");
 
     private final String description;
 

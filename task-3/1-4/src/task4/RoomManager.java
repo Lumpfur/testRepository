@@ -1,5 +1,4 @@
 package task4;
-
 import java.util.*;
 
 public class RoomManager {
@@ -9,7 +8,7 @@ public class RoomManager {
         this.rooms = new HashMap<>();
     }
 
-    //adding the rooms
+    // Add room
     public boolean addRoom(Room room) {
         if (room != null && !rooms.containsKey(room.getNumber())) {
             rooms.put(room.getNumber(), room);
@@ -18,7 +17,7 @@ public class RoomManager {
         return false;
     }
 
-    //remove the rooms
+    // Remove room
     public boolean removeRoom(String roomNumber) {
         Room room = rooms.get(roomNumber);
         if (room != null && room.getStatus() != RoomStatus.OCCUPIED) {
@@ -41,7 +40,7 @@ public class RoomManager {
     public boolean changeRoomStatus(String roomNumber, RoomStatus newStatus) {
         Room room = rooms.get(roomNumber);
         if (room != null) {
-            // u cant switch the status to the under service/tech support with the booked room
+            // Cannot change to maintenance/service if room is occupied
             if (room.getStatus() == RoomStatus.OCCUPIED &&
                     (newStatus == RoomStatus.UNDER_MAINTENANCE ||
                             newStatus == RoomStatus.UNDER_SERVICE)) {
@@ -62,13 +61,12 @@ public class RoomManager {
         return false;
     }
 
-    // get the room
+    // Get room
     public Room getRoom(String roomNumber) {
         return rooms.get(roomNumber);
     }
 
-
-    //get all the rooms
+    // Get all rooms
     public List<Room> getAllRooms() {
         return new ArrayList<>(rooms.values());
     }

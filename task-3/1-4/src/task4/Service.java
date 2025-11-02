@@ -1,8 +1,7 @@
 package task4;
-
 import java.util.Objects;
 
-class Service {
+public class Service {
     private String id;
     private String name;
     private double price;
@@ -38,7 +37,7 @@ class Service {
 
     @Override
     public String toString() {
-        return String.format("Услуга[id=%s, '%s', %.2f руб., %s]",
+        return String.format("Service[id=%s, name='%s', price=%.2f, description=%s]",
                 id, name, price, description);
     }
 }

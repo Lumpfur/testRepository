@@ -1,8 +1,7 @@
 package task4;
-
 import java.util.*;
 
-class ServiceManager {
+public class ServiceManager {
     private Map<String, Service> services;
 
     public ServiceManager() {
