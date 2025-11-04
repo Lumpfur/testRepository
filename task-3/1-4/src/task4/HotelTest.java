@@ -6,7 +6,7 @@ public class HotelTest {
         HotelAdmin admin = new HotelAdmin();
 
         try {
-            System.out.println("init");
+            System.out.println("Init hotel system...");
 
             admin.addRoom(new Room("101", "Standard", 2500.0, 2, 3));
             admin.addRoom(new Room("102", "Standard", 2700.0, 2, 3));
@@ -15,38 +15,49 @@ public class HotelTest {
 
             admin.addGuest(new Guest("G001", "John Smith", "+79161234567", "john@mail.com"));
             admin.addGuest(new Guest("G002", "Jane Doe", "+79161234568", "jane@mail.com"));
+            admin.addGuest(new Guest("G003", "Bob Johnson", "+79161234569", "bob@mail.com"));
+            admin.addGuest(new Guest("G004", "Alice Brown", "+79161234570", "alice@mail.com"));
+
             admin.addService(new Service("S001", "Breakfast", 500.0, "Buffet breakfast"));
             admin.addService(new Service("S002", "SPA", 1500.0, "Spa procedures"));
 
-            admin.checkIn("101", "G001");
-            admin.checkIn("201", "G002");
+            // Demo: Multiple guests in one room
+            System.out.println("\n--- Testing multiple guests per room ---");
+            admin.checkInGuests("201", "G001", "G002"); // Two guests in one room
+            admin.checkIn("301", "G003"); // Single guest in large room
 
-            admin.addServiceToGuest("101", "S001");
-            admin.addServiceToGuest("201", "S002");
+            admin.addGuestToRoom("301", "G004");
+
+            admin.addServiceToGuest("201", "S001");
+            admin.addServiceToGuest("301", "S002");
 
             // Demonstrate new features
             admin.displayAllRoomsSorted("price");
             admin.displayAllRoomsSorted("stars");
             admin.displayAvailableRoomsSorted("capacity");
 
-            admin.displayGuestPayment("101");
-            admin.displayGuestServices("101", "price");
+            // Show current guests count
+            admin.displayTotalGuests(); // Now shows actual current guests count
 
-            admin.displayRoomDetails("101");
+            admin.displayGuestPayment("201");
+            admin.displayGuestServices("201", "price");
+
+            admin.displayRoomDetails("201");
+            admin.displayRoomDetails("301");
 
             // Rooms available by date
             admin.displayRoomsAvailableByDate(LocalDate.now().plusDays(3));
 
             // Total statistics
             admin.displayTotalAvailableRooms();
-            admin.displayTotalGuests();
+            admin.displayTotalGuests(); // This now shows current guests, not historical
 
             // Check out guests to demonstrate history
-            admin.checkOut("101");
             admin.checkOut("201");
+            admin.checkOut("301");
 
             // Stay history
-            admin.displayLastThreeGuests("101");
+            admin.displayLastThreeGuests("201");
 
         } catch (Exception e) {
             System.out.println("Error: " + e.getMessage());
@@ -56,4 +67,3 @@ public class HotelTest {
         }
     }
 }
-

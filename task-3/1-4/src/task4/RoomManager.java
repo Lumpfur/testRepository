@@ -32,6 +32,27 @@ public class RoomManager {
         return room != null && room.checkIn(guest);
     }
 
+    // New method: check in multiple guests to a room
+    public boolean checkInGuests(String roomNumber, List<Guest> guests) {
+        Room room = rooms.get(roomNumber);
+        return room != null && room.checkIn(guests);
+    }
+
+    // New method: add guest to existing room (if there's space)
+    public boolean addGuestToRoom(String roomNumber, Guest guest) {
+        Room room = rooms.get(roomNumber);
+        if (room != null && room.hasAvailableSpace() && room.getStatus() == RoomStatus.OCCUPIED) {
+            return room.checkIn(guest);
+        }
+        return false;
+    }
+
+    // New method: remove specific guest from room
+    public boolean removeGuestFromRoom(String roomNumber, Guest guest) {
+        Room room = rooms.get(roomNumber);
+        return room != null && room.removeGuest(guest);
+    }
+
     public boolean checkOutGuest(String roomNumber) {
         Room room = rooms.get(roomNumber);
         return room != null && room.checkOut();
@@ -66,8 +87,14 @@ public class RoomManager {
         return rooms.get(roomNumber);
     }
 
-    // Get all rooms
     public List<Room> getAllRooms() {
         return new ArrayList<>(rooms.values());
+    }
+
+    // New method: get total number of current guests in hotel
+    public int getTotalCurrentGuests() {
+        return rooms.values().stream()
+                .mapToInt(Room::getCurrentGuestCount)
+                .sum();
     }
 }

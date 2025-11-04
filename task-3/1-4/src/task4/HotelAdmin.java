@@ -1,5 +1,7 @@
 package task4;
 import java.time.LocalDate;
+import java.util.Arrays;
+import java.util.List;
 
 public class HotelAdmin {
     private RoomManager roomManager;
@@ -26,6 +28,28 @@ public class HotelAdmin {
             System.out.println("Guest " + guest.getName() + " checked into room " + roomNumber);
         } else {
             System.out.println("Error: Cannot check in guest to room " + roomNumber);
+        }
+        return success;
+    }
+
+    // New method: check in multiple guests to one room
+    public boolean checkInGuests(String roomNumber, String... guestIds) {
+        List<Guest> guests = Arrays.stream(guestIds)
+                .map(guestManager::getGuest)
+                .filter(guest -> guest != null)
+                .collect(java.util.stream.Collectors.toList());
+
+        if (guests.size() != guestIds.length) {
+            System.out.println("Error: Some guest IDs not found");
+            return false;
+        }
+
+        boolean success = roomManager.checkInGuests(roomNumber, guests);
+        if (success) {
+            System.out.println("Guests " + guests.stream().map(Guest::getName).collect(java.util.stream.Collectors.joining(", ")) +
+                    " checked into room " + roomNumber);
+        } else {
+            System.out.println("Error: Cannot check in guests to room " + roomNumber);
         }
         return success;
     }
@@ -66,6 +90,40 @@ public class HotelAdmin {
             System.out.println("Service " + serviceId + " price changed to: " + newPrice);
         } else {
             System.out.println("Error: Cannot change price for service " + serviceId);
+        }
+        return success;
+    }
+
+    // New method: add additional guest to occupied room
+    public boolean addGuestToRoom(String roomNumber, String guestId) {
+        Guest guest = guestManager.getGuest(guestId);
+        if (guest == null) {
+            System.out.println("Error: Guest ID " + guestId + " not found");
+            return false;
+        }
+
+        boolean success = roomManager.addGuestToRoom(roomNumber, guest);
+        if (success) {
+            System.out.println("Guest " + guest.getName() + " added to room " + roomNumber);
+        } else {
+            System.out.println("Error: Cannot add guest to room " + roomNumber);
+        }
+        return success;
+    }
+
+    // New method: remove specific guest from room
+    public boolean removeGuestFromRoom(String roomNumber, String guestId) {
+        Guest guest = guestManager.getGuest(guestId);
+        if (guest == null) {
+            System.out.println("Error: Guest ID " + guestId + " not found");
+            return false;
+        }
+
+        boolean success = roomManager.removeGuestFromRoom(roomNumber, guest);
+        if (success) {
+            System.out.println("Guest " + guest.getName() + " removed from room " + roomNumber);
+        } else {
+            System.out.println("Error: Cannot remove guest from room " + roomNumber);
         }
         return success;
     }

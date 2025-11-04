@@ -104,13 +104,19 @@ public class HotelReport {
     }
 
     public void displayTotalGuests() {
-        long count = roomManager.getAllRooms().stream()
-                .flatMap(room -> room.getStayHistory().stream())
-                .map(StayRecord::getGuest)
-                .distinct()
-                .count();
-        System.out.println("\n=== Total Guests ===");
-        System.out.println("Unique guests: " + count);
+        int totalCurrentGuests = roomManager.getAllRooms().stream()
+                .mapToInt(Room::getCurrentGuestCount)  // Use new method
+                .sum();
+
+        System.out.println("\n=== Total Current Guests ===");
+        System.out.println("Current guests in hotel: " + totalCurrentGuests);
+
+        // Show details by room
+        System.out.println("Details by room:");
+        roomManager.getAllRooms().stream()
+                .filter(room -> room.getCurrentGuestCount() > 0)
+                .forEach(room -> System.out.printf(" - Room %s: %d guests%n",
+                        room.getNumber(), room.getCurrentGuestCount()));
     }
 
     public void displayRoomsAvailableByDate(LocalDate date) {
@@ -127,7 +133,7 @@ public class HotelReport {
         if (room != null && room.getStatus() == RoomStatus.OCCUPIED) {
             double cost = room.getCurrentGuestCost();
             System.out.println("\n=== Payment for Room " + roomNumber + " ===");
-            System.out.printf("Guest: %s%n", room.getCurrentGuest().getName());
+            System.out.printf("Guests: %s%n", room.getCurrentGuests().stream().map(Guest::getName).collect(Collectors.joining(", ")));
             System.out.printf("Total amount due: %.2f%n", cost);
         } else {
             System.out.println("Room " + roomNumber + " is not occupied");
@@ -165,7 +171,7 @@ public class HotelReport {
                     // no sorting
             }
 
-            System.out.println("\n=== Services for Guest " + room.getCurrentGuest().getName() + " ===");
+            System.out.println("\n=== Services for Guests " + room.getCurrentGuests().stream().map(Guest::getName).collect(Collectors.joining(", ")) + " ===");
             if (services.isEmpty()) {
                 System.out.println("No services ordered");
             } else {
@@ -203,7 +209,7 @@ public class HotelReport {
             System.out.println(room);
             System.out.println("Stay history: " + room.getStayHistory().size() + " records");
             if (room.getStatus() == RoomStatus.OCCUPIED) {
-                System.out.println("Current guest: " + room.getCurrentGuest());
+                System.out.println("Current guests: " + room.getCurrentGuests().stream().map(Guest::getName).collect(Collectors.joining(", ")));
                 System.out.printf("Current cost: %.2f%n", room.getCurrentGuestCost());
             }
         } else {
