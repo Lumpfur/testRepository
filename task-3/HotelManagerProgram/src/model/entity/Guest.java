@@ -1,4 +1,4 @@
-package task4;
+package model.entity;
 import java.util.Objects;
 
 public class Guest {
