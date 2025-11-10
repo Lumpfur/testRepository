@@ -6,11 +6,11 @@ import service.HotelAdmin;
 import java.util.Scanner;
 
 public class MainController {
-    private Scanner scanner;
-    private HotelAdmin hotelAdmin;
-    private GuestController guestController;
-    private RoomController roomController;
-    private ServiceController serviceController;
+    private final Scanner scanner;
+    private final HotelAdmin hotelAdmin;
+    private final GuestController guestController;
+    private final RoomController roomController;
+    private final ServiceController serviceController;
 
     public MainController() {
         this.scanner = new Scanner(System.in);
@@ -21,7 +21,7 @@ public class MainController {
     }
 
     public void start() {
-        System.out.println("Welcome to Hotel Management System!");
+        System.out.println("=== Welcome to Hotel Management System ===");
 
         boolean running = true;
         while (running) {
@@ -30,27 +30,23 @@ public class MainController {
 
             switch (choice) {
                 case 1:
-                    System.out.println("\n=== " + MenuType.GUEST.getDisplayName() + " ===");
                     guestController.showMenu();
                     break;
                 case 2:
-                    System.out.println("\n=== " + MenuType.ROOM.getDisplayName() + " ===");
                     roomController.showMenu();
                     break;
                 case 3:
-                    System.out.println("\n=== " + MenuType.SERVICE.getDisplayName() + " ===");
                     serviceController.showMenu();
                     break;
                 case 4:
-                    System.out.println("\n=== " + MenuType.REPORT.getDisplayName() + " ===");
                     showReportMenu();
                     break;
                 case 0:
                     running = false;
-                    System.out.println("Goodbye!");
+                    System.out.println("Thank you for using Hotel Management System. Goodbye!");
                     break;
                 default:
-                    System.out.println("Invalid option!");
+                    System.out.println("Invalid option! Please try again.");
             }
         }
         scanner.close();
@@ -68,12 +64,13 @@ public class MainController {
 
     private void showReportMenu() {
         String[] options = {
-                "Display all rooms",
-                "Display all guests",
+                "Display all rooms (sorted)",
+                "Display all guests (sorted)",
                 "Display all services",
-                "Display available rooms",
-                "Display regular guests",
-                "Display room details"
+                "Display available rooms (sorted)",
+                "Display regular guests (sorted)",
+                "Display room details",
+                "Display last 3 guests of room"
         };
 
         boolean running = true;
@@ -83,23 +80,25 @@ public class MainController {
 
             switch (choice) {
                 case 1:
-                    hotelAdmin.displayAllRooms();
+                    showSortedRoomsMenu();
                     break;
                 case 2:
-                    hotelAdmin.displayAllGuests();
+                    showSortedGuestsMenu();
                     break;
                 case 3:
                     hotelAdmin.displayAllServices();
                     break;
                 case 4:
-                    hotelAdmin.displayAvailableRoomsSorted("number");
+                    showSortedAvailableRoomsMenu();
                     break;
                 case 5:
-                    hotelAdmin.displayRegularGuestsSorted("name");
+                    showSortedRegularGuestsMenu();
                     break;
                 case 6:
-                    String roomNumber = getStringInput("Enter room number: ");
-                    hotelAdmin.displayRoomDetails(roomNumber);
+                    showRoomDetails();
+                    break;
+                case 7:
+                    showLastThreeGuests();
                     break;
                 case 0:
                     running = false;
@@ -108,6 +107,94 @@ public class MainController {
                     System.out.println("Invalid option!");
             }
         }
+    }
+
+    private void showSortedRoomsMenu() {
+        System.out.println("\n--- Sort Rooms By ---");
+        System.out.println("1. Number");
+        System.out.println("2. Type");
+        System.out.println("3. Price");
+        System.out.println("4. Capacity");
+        System.out.println("5. Stars");
+        System.out.print("Choose sort option: ");
+
+        int sortChoice = getIntInput();
+        String sortBy = switch (sortChoice) {
+            case 1 -> "number";
+            case 2 -> "type";
+            case 3 -> "price";
+            case 4 -> "capacity";
+            case 5 -> "stars";
+            default -> "number";
+        };
+
+        hotelAdmin.displayAllRoomsSorted(sortBy);
+    }
+
+    private void showSortedGuestsMenu() {
+        System.out.println("\n--- Sort Guests By ---");
+        System.out.println("1. Name");
+        System.out.println("2. ID");
+        System.out.println("3. Email");
+        System.out.print("Choose sort option: ");
+
+        int sortChoice = getIntInput();
+        String sortBy = switch (sortChoice) {
+            case 1 -> "name";
+            case 2 -> "id";
+            case 3 -> "email";
+            default -> "name";
+        };
+
+        hotelAdmin.displayRegularGuestsSorted(sortBy);
+    }
+
+    private void showSortedAvailableRoomsMenu() {
+        System.out.println("\n--- Sort Available Rooms By ---");
+        System.out.println("1. Number");
+        System.out.println("2. Type");
+        System.out.println("3. Price");
+        System.out.println("4. Capacity");
+        System.out.print("Choose sort option: ");
+
+        int sortChoice = getIntInput();
+        String sortBy = switch (sortChoice) {
+            case 1 -> "number";
+            case 2 -> "type";
+            case 3 -> "price";
+            case 4 -> "capacity";
+            default -> "number";
+        };
+
+        hotelAdmin.displayAvailableRoomsSorted(sortBy);
+    }
+
+    private void showSortedRegularGuestsMenu() {
+        System.out.println("\n--- Sort Regular Guests By ---");
+        System.out.println("1. Name");
+        System.out.println("2. Stay count");
+        System.out.println("3. Last stay date");
+        System.out.print("Choose sort option: ");
+
+        int sortChoice = getIntInput();
+        String sortBy = switch (sortChoice) {
+            case 1 -> "name";
+            case 2 -> "stayCount";
+            case 3 -> "lastStay";
+            default -> "name";
+        };
+
+        hotelAdmin.displayRegularGuestsSorted(sortBy);
+    }
+
+    private void showRoomDetails() {
+        String roomNumber = getStringInput("Enter room number: ");
+        hotelAdmin.displayRoomDetails(roomNumber);
+    }
+
+    private void showLastThreeGuests() {
+        String roomNumber = getStringInput("Enter room number: ");
+        hotelAdmin.displayLastThreeGuests(roomNumber);
     }
 
     private int getIntInput() {

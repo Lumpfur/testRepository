@@ -1,6 +1,7 @@
 package controller;
 
 import model.entity.Room;
+import model.entity.StayRecord;
 import model.enums.RoomStatus;
 import service.HotelAdmin;
 
@@ -8,7 +9,7 @@ import java.util.List;
 import java.util.Scanner;
 
 public class RoomController extends BaseController {
-    private HotelAdmin hotelAdmin;
+    private final HotelAdmin hotelAdmin;
 
     public RoomController(Scanner scanner, HotelAdmin hotelAdmin) {
         super(scanner);
@@ -23,7 +24,8 @@ public class RoomController extends BaseController {
                 "Update room data",
                 "Delete room",
                 "Find available rooms",
-                "Change room status"
+                "Change room status",
+                "Show last 3 guests"
         };
 
         boolean running = true;
@@ -52,6 +54,9 @@ public class RoomController extends BaseController {
                     break;
                 case 7:
                     changeRoomStatus();
+                    break;
+                case 8:
+                    showLastThreeGuests();
                     break;
                 case 0:
                     running = false;
@@ -138,9 +143,7 @@ public class RoomController extends BaseController {
     private void findAvailableRooms() {
         System.out.println("\n--- Available Rooms ---");
         List<Room> allRooms = hotelAdmin.getRoomManager().getAllRooms();
-        List<Room> availableRooms = allRooms.stream()
-                .filter(Room::isAvailable)
-                .toList();
+        List<Room> availableRooms = allRooms.stream().filter(Room::isAvailable).toList();
 
         if (availableRooms.isEmpty()) {
             System.out.println("No available rooms!");
@@ -185,6 +188,30 @@ public class RoomController extends BaseController {
             System.out.println("Room status changed successfully to: " + newStatus.getDescription());
         } else {
             System.out.println("Failed to change room status!");
+        }
+    }
+
+    // Этот метод теперь вызывается только из showMenu() RoomController
+    private void showLastThreeGuests() {
+        System.out.println("\n--- Last 3 Guests in Room ---");
+        String number = getStringInput("Enter room number: ");
+
+        Room room = hotelAdmin.getRoomManager().getRoom(number);
+        if (room != null) {
+            List<StayRecord> lastGuests = room.getLastGuests(3);
+            if (lastGuests.isEmpty()) {
+                System.out.println("No guest history for room " + number);
+            } else {
+                System.out.println("Last " + lastGuests.size() + " guests in room " + number + ":");
+                for (int i = 0; i < lastGuests.size(); i++) {
+                    StayRecord record = lastGuests.get(i);
+                    System.out.println((i + 1) + ". " + record.getGuest().getName() +
+                            " (Check-in: " + record.getCheckInDate() +
+                            ", Check-out: " + record.getCheckOutDate() + ")");
+                }
+            }
+        } else {
+            System.out.println("Room not found!");
         }
     }
 }

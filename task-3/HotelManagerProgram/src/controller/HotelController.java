@@ -1,5 +1,5 @@
 package controller;
-
+//USELESS CLASS !
 import model.entity.Guest;
 import model.entity.Room;
 import model.entity.Service;
