@@ -1,4 +1,4 @@
-package task4;
+package model.enums;
 
 public enum RoomStatus {
     AVAILABLE("Available"),
