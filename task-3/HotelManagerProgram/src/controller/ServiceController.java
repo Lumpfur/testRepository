@@ -20,7 +20,8 @@ public class ServiceController extends BaseController {
                 "Find service by ID",
                 "Show all services",
                 "Update service data",
-                "Change service price"
+                "Change service price",
+                "Add service to guest"
         };
 
         boolean running = true;
@@ -43,6 +44,9 @@ public class ServiceController extends BaseController {
                     break;
                 case 5:
                     changeServicePrice();
+                    break;
+                case 6:
+                    addServiceToGuest();
                     break;
                 case 0:
                     running = false;
@@ -97,7 +101,6 @@ public class ServiceController extends BaseController {
 
         Service serviceToUpdate = hotelAdmin.getServiceManager().getService(id);
         if (serviceToUpdate != null) {
-
             double price = getDoubleInput("Enter new price: ");
             String description = getStringInput("Enter new description: ");
 
@@ -120,6 +123,19 @@ public class ServiceController extends BaseController {
             System.out.println("Service price changed successfully!");
         } else {
             System.out.println("Failed to change service price!");
+        }
+    }
+
+    private void addServiceToGuest() {
+        System.out.println("\n--- Add Service to Guest ---");
+        String roomNumber = getStringInput("Enter room number: ");
+        String serviceId = getStringInput("Enter service ID: ");
+
+        boolean success = hotelAdmin.addServiceToGuest(roomNumber, serviceId);
+        if (success) {
+            System.out.println("Service added to guest successfully!");
+        } else {
+            System.out.println("Failed to add service to guest!");
         }
     }
 }

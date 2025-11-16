@@ -3,6 +3,7 @@ package controller;
 import model.enums.MenuType;
 import service.HotelAdmin;
 
+import java.time.LocalDate;
 import java.util.Scanner;
 
 public class MainController {
@@ -70,7 +71,19 @@ public class MainController {
                 "Display available rooms (sorted)",
                 "Display regular guests (sorted)",
                 "Display room details",
-                "Display last 3 guests of room"
+                "Display last 3 guests of room",
+                "Display guest payment",
+                "Display guest services",
+                "Display prices",
+                "Display total available rooms",
+                "Display total guests",
+                "Display rooms available by date",
+                "Import guests from CSV",
+                "Import rooms from CSV",
+                "Import services from CSV",
+                "Export guests to CSV",
+                "Export rooms to CSV",
+                "Export services to CSV"
         };
 
         boolean running = true;
@@ -99,6 +112,42 @@ public class MainController {
                     break;
                 case 7:
                     showLastThreeGuests();
+                    break;
+                case 8:
+                    showGuestPayment();
+                    break;
+                case 9:
+                    showGuestServices();
+                    break;
+                case 10:
+                    showPricesMenu();
+                    break;
+                case 11:
+                    hotelAdmin.displayTotalAvailableRooms();
+                    break;
+                case 12:
+                    hotelAdmin.displayTotalGuests();
+                    break;
+                case 13:
+                    showRoomsAvailableByDate();
+                    break;
+                case 14:
+                    importGuestsFromCSV();
+                    break;
+                case 15:
+                    importRoomsFromCSV();
+                    break;
+                case 16:
+                    importServicesFromCSV();
+                    break;
+                case 17:
+                    exportGuestsToCSV();
+                    break;
+                case 18:
+                    exportRoomsToCSV();
+                    break;
+                case 19:
+                    exportServicesToCSV();
                     break;
                 case 0:
                     running = false;
@@ -197,6 +246,50 @@ public class MainController {
         hotelAdmin.displayLastThreeGuests(roomNumber);
     }
 
+    private void showGuestPayment() {
+        String roomNumber = getStringInput("Enter room number: ");
+        hotelAdmin.displayGuestPayment(roomNumber);
+    }
+
+    private void showGuestServices() {
+        String roomNumber = getStringInput("Enter room number: ");
+        System.out.println("Sort services by:");
+        System.out.println("1. Name");
+        System.out.println("2. Price");
+        int sortChoice = getIntInput("Choose sort option: ");
+        String sortBy = (sortChoice == 2) ? "price" : "name";
+        hotelAdmin.displayGuestServices(roomNumber, sortBy);
+    }
+
+    private void showPricesMenu() {
+        System.out.println("Display prices for:");
+        System.out.println("1. Rooms");
+        System.out.println("2. Services");
+        int categoryChoice = getIntInput("Choose category: ");
+        String category = (categoryChoice == 2) ? "services" : "rooms";
+
+        System.out.println("Sort by:");
+        System.out.println("1. Name/Type");
+        System.out.println("2. Price");
+        int sortChoice = getIntInput("Choose sort option: ");
+        String sortBy = (sortChoice == 2) ? "price" : "name";
+
+        hotelAdmin.displayPrices(category, sortBy);
+    }
+
+    private void showRoomsAvailableByDate() {
+        System.out.print("Enter date (YYYY-MM-DD): ");
+        String dateInput = scanner.nextLine();
+
+        try {
+            LocalDate date = LocalDate.parse(dateInput);
+            hotelAdmin.displayRoomsAvailableByDate(date);
+        } catch (Exception e) {
+            System.out.println("Invalid date format! Please use YYYY-MM-DD format.");
+        }
+    }
+
+    // Вспомогательные методы для ввода данных
     private int getIntInput() {
         while (!scanner.hasNextInt()) {
             System.out.print("Please enter a number: ");
@@ -205,6 +298,11 @@ public class MainController {
         int input = scanner.nextInt();
         scanner.nextLine();
         return input;
+    }
+
+    private int getIntInput(String prompt) {
+        System.out.print(prompt);
+        return getIntInput();
     }
 
     private String getStringInput(String prompt) {
@@ -219,5 +317,65 @@ public class MainController {
         }
         System.out.println("0. Back");
         System.out.print("Choose option: ");
+    }
+
+    private void importGuestsFromCSV() {
+        try {
+            String filePath = getStringInput("Enter CSV file path: ");
+            hotelAdmin.importGuestsFromCSV(filePath);
+            System.out.println("Guests imported successfully!");
+        } catch (Exception e) {
+            System.out.println("Import failed: " + e.getMessage());
+        }
+    }
+
+    private void importRoomsFromCSV() {
+        try {
+            String filePath = getStringInput("Enter CSV file path: ");
+            hotelAdmin.importRoomsFromCSV(filePath);
+            System.out.println("Rooms imported successfully!");
+        } catch (Exception e) {
+            System.out.println("Import failed: " + e.getMessage());
+        }
+    }
+
+    private void importServicesFromCSV() {
+        try {
+            String filePath = getStringInput("Enter CSV file path: ");
+            hotelAdmin.importServicesFromCSV(filePath);
+            System.out.println("Services imported successfully!");
+        } catch (Exception e) {
+            System.out.println("Import failed: " + e.getMessage());
+        }
+    }
+
+    private void exportGuestsToCSV() {
+        try {
+            String filePath = getStringInput("Enter CSV file path: ");
+            hotelAdmin.exportGuestsToCSV(filePath);
+            System.out.println("Guests exported successfully!");
+        } catch (Exception e) {
+            System.out.println("Export failed: " + e.getMessage());
+        }
+    }
+
+    private void exportRoomsToCSV() {
+        try {
+            String filePath = getStringInput("Enter CSV file path: ");
+            hotelAdmin.exportRoomsToCSV(filePath);
+            System.out.println("Rooms exported successfully!");
+        } catch (Exception e) {
+            System.out.println("Export failed: " + e.getMessage());
+        }
+    }
+
+    private void exportServicesToCSV() {
+        try {
+            String filePath = getStringInput("Enter CSV file path: ");
+            hotelAdmin.exportServicesToCSV(filePath);
+            System.out.println("Services exported successfully!");
+        } catch (Exception e) {
+            System.out.println("Export failed: " + e.getMessage());
+        }
     }
 }

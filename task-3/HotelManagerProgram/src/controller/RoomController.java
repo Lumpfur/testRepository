@@ -1,10 +1,12 @@
 package controller;
 
+import model.entity.Guest;
 import model.entity.Room;
 import model.entity.StayRecord;
 import model.enums.RoomStatus;
 import service.HotelAdmin;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Scanner;
 
@@ -25,7 +27,13 @@ public class RoomController extends BaseController {
                 "Delete room",
                 "Find available rooms",
                 "Change room status",
-                "Show last 3 guests"
+                "Show last 3 guests",
+                "Check-in guest",
+                "Check-out guest",
+                "Check-in multiple guests",
+                "Add guest to occupied room",
+                "Remove guest from room",
+                "Rooms available by date"
         };
 
         boolean running = true;
@@ -57,6 +65,24 @@ public class RoomController extends BaseController {
                     break;
                 case 8:
                     showLastThreeGuests();
+                    break;
+                case 9:
+                    checkInGuest();
+                    break;
+                case 10:
+                    checkOutGuest();
+                    break;
+                case 11:
+                    checkInMultipleGuests();
+                    break;
+                case 12:
+                    addGuestToRoom();
+                    break;
+                case 13:
+                    removeGuestFromRoom();
+                    break;
+                case 14:
+                    showRoomsAvailableByDate();
                     break;
                 case 0:
                     running = false;
@@ -143,7 +169,9 @@ public class RoomController extends BaseController {
     private void findAvailableRooms() {
         System.out.println("\n--- Available Rooms ---");
         List<Room> allRooms = hotelAdmin.getRoomManager().getAllRooms();
-        List<Room> availableRooms = allRooms.stream().filter(Room::isAvailable).toList();
+        List<Room> availableRooms = allRooms.stream()
+                .filter(Room::isAvailable)
+                .toList();
 
         if (availableRooms.isEmpty()) {
             System.out.println("No available rooms!");
@@ -191,7 +219,6 @@ public class RoomController extends BaseController {
         }
     }
 
-    // Этот метод теперь вызывается только из showMenu() RoomController
     private void showLastThreeGuests() {
         System.out.println("\n--- Last 3 Guests in Room ---");
         String number = getStringInput("Enter room number: ");
@@ -212,6 +239,86 @@ public class RoomController extends BaseController {
             }
         } else {
             System.out.println("Room not found!");
+        }
+    }
+
+    private void checkInGuest() {
+        System.out.println("\n--- Check-in Guest ---");
+        String roomNumber = getStringInput("Enter room number: ");
+        String guestId = getStringInput("Enter guest ID: ");
+
+        boolean success = hotelAdmin.checkIn(roomNumber, guestId);
+        if (success) {
+            System.out.println("Guest checked in successfully!");
+        } else {
+            System.out.println("Failed to check in guest!");
+        }
+    }
+
+    private void checkOutGuest() {
+        System.out.println("\n--- Check-out Guest ---");
+        String roomNumber = getStringInput("Enter room number: ");
+
+        boolean success = hotelAdmin.checkOut(roomNumber);
+        if (success) {
+            System.out.println("Guest checked out successfully!");
+        } else {
+            System.out.println("Failed to check out guest!");
+        }
+    }
+
+    private void checkInMultipleGuests() {
+        System.out.println("\n--- Check-in Multiple Guests ---");
+        String roomNumber = getStringInput("Enter room number: ");
+
+        System.out.print("Enter guest IDs (comma separated): ");
+        String guestIdsInput = scanner.nextLine();
+        String[] guestIds = guestIdsInput.split(",");
+
+        boolean success = hotelAdmin.checkInGuests(roomNumber, guestIds);
+        if (success) {
+            System.out.println("Guests checked in successfully!");
+        } else {
+            System.out.println("Failed to check in guests!");
+        }
+    }
+
+    private void addGuestToRoom() {
+        System.out.println("\n--- Add Guest to Occupied Room ---");
+        String roomNumber = getStringInput("Enter room number: ");
+        String guestId = getStringInput("Enter guest ID: ");
+
+        boolean success = hotelAdmin.addGuestToRoom(roomNumber, guestId);
+        if (success) {
+            System.out.println("Guest added to room successfully!");
+        } else {
+            System.out.println("Failed to add guest to room!");
+        }
+    }
+
+    private void removeGuestFromRoom() {
+        System.out.println("\n--- Remove Guest from Room ---");
+        String roomNumber = getStringInput("Enter room number: ");
+        String guestId = getStringInput("Enter guest ID: ");
+
+        boolean success = hotelAdmin.removeGuestFromRoom(roomNumber, guestId);
+        if (success) {
+            System.out.println("Guest removed from room successfully!");
+        } else {
+            System.out.println("Failed to remove guest from room!");
+        }
+    }
+
+    private void showRoomsAvailableByDate() {
+        System.out.println("\n--- Rooms Available by Date ---");
+        System.out.print("Enter date (YYYY-MM-DD): ");
+        String dateInput = scanner.nextLine();
+
+        try {
+            LocalDate date = LocalDate.parse(dateInput);
+            hotelAdmin.displayRoomsAvailableByDate(date);
+        } catch (Exception e) {
+            System.out.println("Invalid date format! Please use YYYY-MM-DD format.");
         }
     }
 }
