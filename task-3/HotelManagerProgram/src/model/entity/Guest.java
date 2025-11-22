@@ -1,11 +1,16 @@
 package model.entity;
+
 import java.util.Objects;
+import java.time.LocalDateTime;
 
 public class Guest {
     private String id;
     private String name;
     private String phone;
     private String email;
+    private String document;
+    private LocalDateTime checkInDate;
+    private LocalDateTime checkOutDate;
 
     public Guest(String id, String name, String phone, String email) {
         this.id = id;

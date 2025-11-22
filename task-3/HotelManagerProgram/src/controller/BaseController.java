@@ -2,11 +2,27 @@ package controller;
 
 import java.util.Scanner;
 
+import exception.HotelException;
+import exception.ValidationException;
+
 public abstract class BaseController {
     protected Scanner scanner;
 
     public BaseController(Scanner scanner) {
         this.scanner = scanner;
+    }
+
+    protected void handleOperation(Runnable operation, String successMessage) {
+        try {
+            operation.run();
+            System.out.println(successMessage);
+        } catch (ValidationException e) {
+            System.out.println("Validation error: " + e.getMessage());
+        } catch (HotelException e) {
+            System.out.println("Hotel system error: " + e.getMessage());
+        } catch (Exception e) {
+            System.out.println("Unexpected error: " + e.getMessage());
+        }
     }
 
     protected void printMenu(String title, String[] options) {

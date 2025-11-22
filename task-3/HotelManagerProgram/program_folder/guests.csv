@@ -1,4 +1,3 @@
 ID,Name,Phone,Email
-G001,John Doe,+123456789,john@email.com
-G002,Jane Smith,+987654321,jane@email.com
-G003,Bob Johnson,+555555555,bob@email.com
+G1,John Doe,+123456789,john@email.com
+G2,Jane Smith,+987654321,jane@email.com

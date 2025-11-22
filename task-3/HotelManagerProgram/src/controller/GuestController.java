@@ -19,7 +19,9 @@ public class GuestController extends BaseController {
                 "Add guest",
                 "Find guest by ID",
                 "Show all guests",
-                "Update guest data"
+                "Update guest data",
+                "Import guests from CSV",
+                "Export guests from CSV"
         };
 
         boolean running = true;
@@ -39,6 +41,12 @@ public class GuestController extends BaseController {
                     break;
                 case 4:
                     updateGuest();
+                    break;
+                case 5:
+                    importGuestsFromCSV();
+                    break;
+                case 6:
+                    exportGuestsToCSV();
                     break;
                 case 0:
                     running = false;
@@ -104,6 +112,28 @@ public class GuestController extends BaseController {
             System.out.println("Guest data updated!");
         } else {
             System.out.println("Guest not found!");
+        }
+    }
+
+    private void exportGuestsToCSV() {
+        try {
+            System.out.println("\n--- Export Guests to CSV ---");
+            String filePath = getStringInput("Enter CSV file path: ");
+            hotelAdmin.exportGuestsToCSV(filePath);
+            System.out.println("Export completed successfully!");
+        } catch (Exception e) {
+            System.out.println("Error during export: " + e.getMessage());
+        }
+    }
+
+    private void importGuestsFromCSV() {
+        try {
+            System.out.println("\n--- Import Guests from CSV ---");
+            String filePath = getStringInput("Enter CSV file path: ");
+            hotelAdmin.importGuestsFromCSV(filePath);
+            System.out.println("Import completed successfully!");
+        } catch (Exception e) {
+            System.out.println("Error during import: " + e.getMessage());
         }
     }
 }
