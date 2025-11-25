@@ -1,4 +1,10 @@
-package task4;
+package test;
+
+import model.entity.Guest;
+import model.entity.Room;
+import model.entity.Service;
+import service.HotelAdmin;
+
 import java.time.LocalDate;
 
 public class HotelTest {

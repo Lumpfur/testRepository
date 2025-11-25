@@ -1,4 +1,5 @@
-package task4;
+package model.entity;
+
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 

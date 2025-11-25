@@ -1,4 +1,6 @@
-package task4;
+package model.manager;
+
+import model.entity.Service;
 import java.util.*;
 
 public class ServiceManager {

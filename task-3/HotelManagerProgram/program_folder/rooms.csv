@@ -1,0 +1,3 @@
+Number,Type,Price,Capacity,Stars,Status,CurrentGuests,GuestServices
+"101","Standard",100.0,2,3,OCCUPIED,"G1|John Doe|+123456789|john@email.com","S1|Dinner|25.0|Evening meal"
+"102","Deluxe",200.0,3,4,AVAILABLE,,

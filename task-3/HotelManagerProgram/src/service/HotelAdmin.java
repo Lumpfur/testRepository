@@ -1,13 +1,20 @@
-package task4;
+package service;
+
+import model.entity.*;
+import model.enums.*;
+import model.manager.*;
+import exception.ImportException;
+import exception.ExportException;
+
 import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.List;
 
 public class HotelAdmin {
-    private RoomManager roomManager;
-    private GuestManager guestManager;
-    private ServiceManager serviceManager;
-    private HotelReport hotelReport;
+    private final RoomManager roomManager;
+    private final GuestManager guestManager;
+    private final ServiceManager serviceManager;
+    private final HotelReport hotelReport;
 
     public HotelAdmin() {
         this.roomManager = new RoomManager();
@@ -170,6 +177,69 @@ public class HotelAdmin {
             return success;
         }
         return false;
+    }
+
+    public void importGuestsFromCSV(String filePath) {
+        try {
+            List<Guest> importedGuests = CSVImporter.importGuests(filePath, this);
+            System.out.println("Successfully imported " + importedGuests.size() + " guests");
+        } catch (ImportException e) {
+            System.out.println("Import failed: " + e.getMessage());
+            throw e;
+        }
+    }
+
+    public void importRoomsFromCSV(String filePath) {
+        try {
+            List<Room> importedRooms = CSVImporter.importRooms(filePath, this);
+            System.out.println("Successfully imported " + importedRooms.size() + " rooms");
+        } catch (ImportException e) {
+            System.out.println("Import failed: " + e.getMessage());
+            throw e;
+        }
+    }
+
+    public void importServicesFromCSV(String filePath) {
+        try {
+            List<Service> importedServices = CSVImporter.importServices(filePath, this);
+            System.out.println("Successfully imported " + importedServices.size() + " services");
+        } catch (ImportException e) {
+            System.out.println("Import failed: " + e.getMessage());
+            throw e;
+        }
+    }
+
+    public void exportGuestsToCSV(String filePath) {
+        try {
+            List<Guest> guests = guestManager.getAllGuests();
+            CSVExporter.exportGuests(guests, filePath);
+            System.out.println("Successfully exported " + guests.size() + " guests to " + filePath);
+        } catch (ExportException e) {
+            System.out.println("Export failed: " + e.getMessage());
+            throw e;
+        }
+    }
+
+    public void exportRoomsToCSV(String filePath) {
+        try {
+            List<Room> rooms = roomManager.getAllRooms();
+            CSVExporter.exportRooms(rooms, filePath);
+            System.out.println("Successfully exported " + rooms.size() + " rooms to " + filePath);
+        } catch (ExportException e) {
+            System.out.println("Export failed: " + e.getMessage());
+            throw e;
+        }
+    }
+
+    public void exportServicesToCSV(String filePath) {
+        try {
+            List<Service> services = serviceManager.getAllServices();
+            CSVExporter.exportServices(services, filePath);
+            System.out.println("Successfully exported " + services.size() + " services to " + filePath);
+        } catch (ExportException e) {
+            System.out.println("Export failed: " + e.getMessage());
+            throw e;
+        }
     }
 
     // Reporting methods

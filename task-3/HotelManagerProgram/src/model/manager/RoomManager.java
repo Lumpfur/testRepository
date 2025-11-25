@@ -1,4 +1,8 @@
-package task4;
+package model.manager;
+
+import model.enums.RoomStatus;
+import model.entity.*;
+
 import java.util.*;
 
 public class RoomManager {
