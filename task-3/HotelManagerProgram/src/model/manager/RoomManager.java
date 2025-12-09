@@ -2,17 +2,20 @@ package model.manager;
 
 import model.enums.RoomStatus;
 import model.entity.*;
+import config.HotelConfig;
 
+import java.io.Serializable;
 import java.util.*;
 
-public class RoomManager {
+public class RoomManager implements Serializable {
+    private static final long serialVersionUID = 1L;
+
     private Map<String, Room> rooms;
 
     public RoomManager() {
         this.rooms = new HashMap<>();
     }
 
-    // Add room
     public boolean addRoom(Room room) {
         if (room != null && !rooms.containsKey(room.getNumber())) {
             rooms.put(room.getNumber(), room);
@@ -21,7 +24,6 @@ public class RoomManager {
         return false;
     }
 
-    // Remove room
     public boolean removeRoom(String roomNumber) {
         Room room = rooms.get(roomNumber);
         if (room != null && room.getStatus() != RoomStatus.OCCUPIED) {
@@ -36,13 +38,11 @@ public class RoomManager {
         return room != null && room.checkIn(guest);
     }
 
-    // New method: check in multiple guests to a room
     public boolean checkInGuests(String roomNumber, List<Guest> guests) {
         Room room = rooms.get(roomNumber);
         return room != null && room.checkIn(guests);
     }
 
-    // New method: add guest to existing room (if there's space)
     public boolean addGuestToRoom(String roomNumber, Guest guest) {
         Room room = rooms.get(roomNumber);
         if (room != null && room.hasAvailableSpace() && room.getStatus() == RoomStatus.OCCUPIED) {
@@ -51,7 +51,6 @@ public class RoomManager {
         return false;
     }
 
-    // New method: remove specific guest from room
     public boolean removeGuestFromRoom(String roomNumber, Guest guest) {
         Room room = rooms.get(roomNumber);
         return room != null && room.removeGuest(guest);
@@ -65,7 +64,11 @@ public class RoomManager {
     public boolean changeRoomStatus(String roomNumber, RoomStatus newStatus) {
         Room room = rooms.get(roomNumber);
         if (room != null) {
-            // Cannot change to maintenance/service if room is occupied
+            if (!HotelConfig.getInstance().isRoomStatusChangeEnabled()) {
+                System.out.println("Room status change is disabled in configuration");
+                return false;
+            }
+
             if (room.getStatus() == RoomStatus.OCCUPIED &&
                     (newStatus == RoomStatus.UNDER_MAINTENANCE ||
                             newStatus == RoomStatus.UNDER_SERVICE)) {
@@ -86,7 +89,6 @@ public class RoomManager {
         return false;
     }
 
-    // Get room
     public Room getRoom(String roomNumber) {
         return rooms.get(roomNumber);
     }
@@ -95,7 +97,6 @@ public class RoomManager {
         return new ArrayList<>(rooms.values());
     }
 
-    // New method: get total number of current guests in hotel
     public int getTotalCurrentGuests() {
         return rooms.values().stream()
                 .mapToInt(Room::getCurrentGuestCount)

@@ -4,11 +4,15 @@ import model.entity.*;
 import model.enums.*;
 import model.manager.*;
 
+import java.io.Serializable;
+
 import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
 
-public class HotelReport {
+public class HotelReport implements Serializable {
+    private static final long serialVersionUID = 1L;
+
     private RoomManager roomManager;
     private GuestManager guestManager;
 

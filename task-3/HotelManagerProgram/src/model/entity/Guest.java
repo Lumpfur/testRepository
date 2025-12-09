@@ -1,9 +1,12 @@
 package model.entity;
 
+import java.io.Serializable;
 import java.util.Objects;
 import java.time.LocalDateTime;
 
-public class Guest {
+public class Guest implements Serializable {
+    private static final long serialVersionUID = 1L;
+
     private String id;
     private String name;
     private String phone;
