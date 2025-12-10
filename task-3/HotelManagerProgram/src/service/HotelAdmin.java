@@ -5,22 +5,67 @@ import model.enums.*;
 import model.manager.*;
 import exception.ImportException;
 import exception.ExportException;
+import config.HotelConfig;
 
+import java.io.*;
 import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.List;
 
-public class HotelAdmin {
+public class HotelAdmin implements Serializable {
+    private static final long serialVersionUID = 1L;
+    private static final String SAVE_FILE = "hotel_state.ser";
+
     private final RoomManager roomManager;
     private final GuestManager guestManager;
     private final ServiceManager serviceManager;
     private final HotelReport hotelReport;
 
     public HotelAdmin() {
-        this.roomManager = new RoomManager();
-        this.guestManager = new GuestManager();
-        this.serviceManager = new ServiceManager();
-        this.hotelReport = new HotelReport(roomManager, guestManager);
+        HotelAdmin loaded = loadState();
+        if (loaded != null) {
+            this.roomManager = loaded.roomManager;
+            this.guestManager = loaded.guestManager;
+            this.serviceManager = loaded.serviceManager;
+            this.hotelReport = new HotelReport(roomManager, guestManager);
+            System.out.println("Program status was loaded from file");
+        } else {
+            this.roomManager = new RoomManager();
+            this.guestManager = new GuestManager();
+            this.serviceManager = new ServiceManager();
+            this.hotelReport = new HotelReport(roomManager, guestManager);
+            System.out.println("The new data base of hotel was created");
+        }
+    }
+
+    // method for saving statement
+    public void saveState() {
+        try (ObjectOutputStream oos = new ObjectOutputStream(
+                new FileOutputStream(SAVE_FILE))) {
+            oos.writeObject(this);
+            System.out.println("Program status was saved into the file: " + SAVE_FILE);
+        } catch (IOException e) {
+            System.err.println("Error: saving into the file: " + e.getMessage());
+        }
+    }
+
+    //method for loading statement
+    private HotelAdmin loadState() {
+        File file = new File(SAVE_FILE);
+        if (!file.exists()) {
+            System.out.println("There is no loading file, creating new data base");
+            return null;
+        }
+
+        try (ObjectInputStream ois = new ObjectInputStream(
+                new FileInputStream(SAVE_FILE))) {
+            HotelAdmin loaded = (HotelAdmin) ois.readObject();
+            System.out.println("Statement loading success");
+            return loaded;
+        } catch (IOException | ClassNotFoundException e) {
+            System.err.println("Error: loading statement: " + e.getMessage());
+            return null;
+        }
     }
 
     public boolean checkIn(String roomNumber, String guestId) {
@@ -39,7 +84,6 @@ public class HotelAdmin {
         return success;
     }
 
-    // New method: check in multiple guests to one room
     public boolean checkInGuests(String roomNumber, String... guestIds) {
         List<Guest> guests = Arrays.stream(guestIds)
                 .map(guestManager::getGuest)
@@ -72,6 +116,11 @@ public class HotelAdmin {
     }
 
     public boolean changeRoomStatus(String roomNumber, RoomStatus newStatus) {
+        if (!HotelConfig.getInstance().isRoomStatusChangeEnabled()) {
+            System.out.println("Error: Room status changes are currently disabled in system configuration");
+            return false;
+        }
+
         boolean success = roomManager.changeRoomStatus(roomNumber, newStatus);
         if (success) {
             System.out.println("Room " + roomNumber + " status changed to: " + newStatus.getDescription());
@@ -101,7 +150,6 @@ public class HotelAdmin {
         return success;
     }
 
-    // New method: add additional guest to occupied room
     public boolean addGuestToRoom(String roomNumber, String guestId) {
         Guest guest = guestManager.getGuest(guestId);
         if (guest == null) {
@@ -118,7 +166,6 @@ public class HotelAdmin {
         return success;
     }
 
-    // New method: remove specific guest from room
     public boolean removeGuestFromRoom(String roomNumber, String guestId) {
         Guest guest = guestManager.getGuest(guestId);
         if (guest == null) {
@@ -165,7 +212,6 @@ public class HotelAdmin {
         return success;
     }
 
-    // Add service to guest
     public boolean addServiceToGuest(String roomNumber, String serviceId) {
         Room room = roomManager.getRoom(roomNumber);
         Service service = serviceManager.getService(serviceId);
@@ -300,6 +346,11 @@ public class HotelAdmin {
     public void displayAllServices() {
         System.out.println("\n=== All Services ===");
         serviceManager.getAllServices().forEach(System.out::println);
+    }
+
+    public void reloadConfiguration() {
+        HotelConfig.getInstance().reloadConfiguration();
+        System.out.println("Configuration reloaded from file");
     }
 
     public RoomManager getRoomManager() { return roomManager; }

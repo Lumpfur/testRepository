@@ -1,9 +1,12 @@
 package model.entity;
 
+import java.io.Serializable;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 
-public class StayRecord {
+public class StayRecord implements Serializable {
+    private static final long serialVersionUID = 1L;
+
     private Guest guest;
     private LocalDate checkInDate;
     private LocalDate checkOutDate;

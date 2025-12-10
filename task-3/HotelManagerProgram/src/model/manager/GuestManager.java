@@ -1,16 +1,18 @@
 package model.manager;
 
 import model.entity.Guest;
+import java.io.Serializable;
 import java.util.*;
 
-public class GuestManager {
+public class GuestManager implements Serializable {
+    private static final long serialVersionUID = 1L;
+
     private Map<String, Guest> guests;
 
     public GuestManager() {
         this.guests = new HashMap<>();
     }
 
-    // Add guest
     public boolean addGuest(Guest guest) {
         if (guest != null && !guests.containsKey(guest.getId())) {
             guests.put(guest.getId(), guest);

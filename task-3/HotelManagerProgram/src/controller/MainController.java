@@ -1,7 +1,9 @@
 package controller;
 
+import config.ConfigurationManager;
 import model.enums.MenuType;
 import service.HotelAdmin;
+import config.HotelConfig;
 
 import java.time.LocalDate;
 import java.util.Scanner;
@@ -19,6 +21,12 @@ public class MainController {
         this.guestController = new GuestController(scanner, hotelAdmin);
         this.roomController = new RoomController(scanner, hotelAdmin);
         this.serviceController = new ServiceController(scanner, hotelAdmin);
+
+        // Add shutdown hook for automatic saving when program closes
+        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+            System.out.println("\nAutomatic program state saving...");
+            hotelAdmin.saveState();
+        }));
     }
 
     public void start() {
@@ -44,6 +52,9 @@ public class MainController {
                     break;
                 case 0:
                     running = false;
+                    // Save state on normal exit
+                    System.out.println("Saving program state...");
+                    hotelAdmin.saveState();
                     System.out.println("Thank you for using Hotel Management System. Goodbye!");
                     break;
                 default:
@@ -83,7 +94,10 @@ public class MainController {
                 "Import services from CSV",
                 "Export guests to CSV",
                 "Export rooms to CSV",
-                "Export services to CSV"
+                "Export services to CSV",
+                "Manage configuration",
+                "Save program state",  // New option
+                "Reload program state" // New option
         };
 
         boolean running = true;
@@ -149,6 +163,18 @@ public class MainController {
                 case 19:
                     exportServicesToCSV();
                     break;
+                case 20:
+                    manageConfiguration();
+                    break;
+                case 21:
+                    // Save state
+                    hotelAdmin.saveState();
+                    break;
+                case 22:
+                    // Reload state
+                    System.out.println("Reloading state...");
+                    System.out.println("For full reload, please restart the program");
+                    break;
                 case 0:
                     running = false;
                     break;
@@ -156,6 +182,110 @@ public class MainController {
                     System.out.println("Invalid option!");
             }
         }
+    }
+
+    private void manageConfiguration() {
+        System.out.println("\n=== Configuration Management ===");
+
+        // Getting the config manager
+        ConfigurationManager configManager = ConfigurationManager.getInstance();
+
+        System.out.println("Options:");
+        System.out.println("1. View all configurations");
+        System.out.println("2. Reload all configurations");
+        System.out.println("3. Save all configurations");
+        System.out.println("4. Edit specific configuration");
+        System.out.println("0. Back");
+
+        int choice = getIntInput("Choose option: ");
+
+        switch (choice) {
+            case 1:
+                configManager.printAllConfigurations();
+                break;
+            case 2:
+                configManager.reloadAllConfigurations();
+                break;
+            case 3:
+                configManager.saveAllConfigurations();
+                break;
+            case 4:
+                editConfiguration();
+                break;
+            case 0:
+                return;
+            default:
+                System.out.println("Invalid option");
+        }
+    }
+
+    private void editConfiguration() {
+        System.out.println("\n=== Edit Configuration ===");
+        System.out.println("Select configuration to edit:");
+        System.out.println("1. Hotel Configuration");
+        System.out.println("2. Room Configuration");
+        System.out.println("3. Service Configuration");
+        System.out.println("0. Back");
+
+        int choice = getIntInput("Choose option: ");
+
+        switch (choice) {
+            case 1:
+                editHotelConfig();
+                break;
+            case 2:
+                editRoomConfig();
+                break;
+            case 3:
+                editServiceConfig();
+                break;
+            case 0:
+                return;
+            default:
+                System.out.println("Invalid option");
+        }
+    }
+
+    private void editHotelConfig() {
+        HotelConfig config = HotelConfig.getInstance();
+        System.out.println("\n=== Edit Hotel Configuration ===");
+
+        // Display current values
+        System.out.println("Current configuration:");
+        System.out.println("Room status change enabled: " + config.isRoomStatusChangeEnabled());
+        System.out.println("Room history size: " + config.getRoomHistorySize());
+
+        // Ask for new values
+        System.out.print("Enable room status change? (true/false): ");
+        String statusInput = scanner.nextLine();
+        boolean roomStatusChangeEnabled = Boolean.parseBoolean(statusInput);
+
+        System.out.print("Enter room history size: ");
+        int historySize = getIntInput();
+
+        // Update configuration
+        config.updateConfiguration(roomStatusChangeEnabled, historySize);
+
+        System.out.println("Hotel configuration updated");
+    }
+
+    private void editRoomConfig() {
+        System.out.println("\n=== Edit Room Configuration ===");
+        System.out.println("Room configuration editing not implemented yet.");
+        // TODO: Implement room configuration editing
+    }
+
+    private void editServiceConfig() {
+        System.out.println("\n=== Edit Service Configuration ===");
+        System.out.println("Service configuration editing not implemented yet.");
+        // TODO: Implement service configuration editing
+    }
+
+    // Helper method to get boolean input
+    private boolean getBooleanInput(String prompt) {
+        System.out.print(prompt);
+        String input = scanner.nextLine().toLowerCase();
+        return input.equals("y") || input.equals("yes") || input.equals("true") || input.equals("1");
     }
 
     private void showSortedRoomsMenu() {
@@ -289,7 +419,7 @@ public class MainController {
         }
     }
 
-    // Вспомогательные методы для ввода данных
+    // Helper methods for data input
     private int getIntInput() {
         while (!scanner.hasNextInt()) {
             System.out.print("Please enter a number: ");
