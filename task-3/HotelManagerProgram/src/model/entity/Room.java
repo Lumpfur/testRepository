@@ -1,5 +1,6 @@
 package model.entity;
 
+import config.RoomConfig;
 import model.enums.RoomStatus;
 import config.HotelConfig;
 
@@ -11,6 +12,8 @@ import java.util.stream.Collectors;
 
 public class Room implements Serializable {
     private static final long serialVersionUID = 1L;
+    private static final HotelConfig hotelConfig = HotelConfig.getInstance();
+    private static final RoomConfig roomConfig = new RoomConfig();
 
     private String number;
     private String type;
@@ -22,6 +25,19 @@ public class Room implements Serializable {
     private List<StayRecord> stayHistory;
     private List<Service> guestServices;
 
+    public Room(String number, String type) {
+        this(number, type,
+                roomConfig.getMinPrice(),
+                roomConfig.getDefaultCapacity(),
+                roomConfig.getDefaultStars());
+    }
+
+    public Room(String number, String type, double price) {
+        this(number, type, price,
+                roomConfig.getDefaultCapacity(),
+                roomConfig.getDefaultStars());
+    }
+
     public Room(String number, String type, double price, int capacity, int stars) {
         this.number = number;
         this.type = type;
@@ -32,13 +48,38 @@ public class Room implements Serializable {
         this.currentGuests = new ArrayList<>();
         this.stayHistory = new ArrayList<>();
         this.guestServices = new ArrayList<>();
+
+        //checking config limits
+        validateConfiguration();
     }
 
-    public Room(String number, String type, double price) {
-        this(number, type, price, 2, 3);
+    private void validateConfiguration() {
+        if (capacity > hotelConfig.getMaxGuestsPerRoom()) {
+            System.out.println("Warning: Room capacity exceeds maximum allowed (" +
+                    hotelConfig.getMaxGuestsPerRoom() + ")");
+        }
+
+        if (price < roomConfig.getMinPrice() || price > roomConfig.getMaxPrice()) {
+            System.out.println("Warning: Room price is outside allowed range (" +
+                    roomConfig.getMinPrice() + " - " + roomConfig.getMaxPrice() + ")");
+        }
     }
 
-    // Геттеры
+    public void updateConfiguration() {
+        enforceHistoryLimit();
+    }
+
+    private void enforceHistoryLimit() {
+        int maxSize = hotelConfig.getRoomHistorySize();
+        if (stayHistory.size() > maxSize) {
+            stayHistory = new ArrayList<>(stayHistory.subList(stayHistory.size() - maxSize, stayHistory.size()));
+        }
+    }
+
+    public static RoomConfig getRoomConfig() {
+        return roomConfig;
+    }
+
     public String getNumber() { return number; }
     public String getType() { return type; }
     public double getPrice() { return price; }

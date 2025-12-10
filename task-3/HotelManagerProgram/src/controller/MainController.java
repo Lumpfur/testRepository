@@ -1,5 +1,6 @@
 package controller;
 
+import config.ConfigurationManager;
 import model.enums.MenuType;
 import service.HotelAdmin;
 import config.HotelConfig;
@@ -185,44 +186,107 @@ public class MainController {
 
     private void manageConfiguration() {
         System.out.println("\n=== Configuration Management ===");
-        HotelConfig config = HotelConfig.getInstance();
 
-        System.out.println("Current configuration:");
-        System.out.println("1. Room status change: " + (config.isRoomStatusChangeEnabled() ? "ENABLED" : "DISABLED"));
-        System.out.println("2. Room history size: " + config.getRoomHistorySize() + " records");
+        // Getting the config manager
+        ConfigurationManager configManager = ConfigurationManager.getInstance();
 
-        System.out.println("\nOptions:");
-        System.out.println("1. Toggle room status change");
-        System.out.println("2. Change history size");
-        System.out.println("3. Reload configuration from file");
+        System.out.println("Options:");
+        System.out.println("1. View all configurations");
+        System.out.println("2. Reload all configurations");
+        System.out.println("3. Save all configurations");
+        System.out.println("4. Edit specific configuration");
         System.out.println("0. Back");
 
         int choice = getIntInput("Choose option: ");
 
         switch (choice) {
             case 1:
-                boolean newStatus = !config.isRoomStatusChangeEnabled();
-                config.updateConfiguration(newStatus, config.getRoomHistorySize());
-                System.out.println("Room status change " + (newStatus ? "enabled" : "disabled"));
+                configManager.printAllConfigurations();
                 break;
             case 2:
-                int newSize = getIntInput("Enter new history size: ");
-                if (newSize > 0) {
-                    config.updateConfiguration(config.isRoomStatusChangeEnabled(), newSize);
-                    System.out.println("History size changed to: " + newSize);
-                } else {
-                    System.out.println("Invalid history size");
-                }
+                configManager.reloadAllConfigurations();
                 break;
             case 3:
-                hotelAdmin.reloadConfiguration();
+                configManager.saveAllConfigurations();
+                break;
+            case 4:
+                editConfiguration();
                 break;
             case 0:
                 return;
             default:
                 System.out.println("Invalid option");
         }
-    }  // Closing bracket for manageConfiguration method
+    }
+
+    private void editConfiguration() {
+        System.out.println("\n=== Edit Configuration ===");
+        System.out.println("Select configuration to edit:");
+        System.out.println("1. Hotel Configuration");
+        System.out.println("2. Room Configuration");
+        System.out.println("3. Service Configuration");
+        System.out.println("0. Back");
+
+        int choice = getIntInput("Choose option: ");
+
+        switch (choice) {
+            case 1:
+                editHotelConfig();
+                break;
+            case 2:
+                editRoomConfig();
+                break;
+            case 3:
+                editServiceConfig();
+                break;
+            case 0:
+                return;
+            default:
+                System.out.println("Invalid option");
+        }
+    }
+
+    private void editHotelConfig() {
+        HotelConfig config = HotelConfig.getInstance();
+        System.out.println("\n=== Edit Hotel Configuration ===");
+
+        // Display current values
+        System.out.println("Current configuration:");
+        System.out.println("Room status change enabled: " + config.isRoomStatusChangeEnabled());
+        System.out.println("Room history size: " + config.getRoomHistorySize());
+
+        // Ask for new values
+        System.out.print("Enable room status change? (true/false): ");
+        String statusInput = scanner.nextLine();
+        boolean roomStatusChangeEnabled = Boolean.parseBoolean(statusInput);
+
+        System.out.print("Enter room history size: ");
+        int historySize = getIntInput();
+
+        // Update configuration
+        config.updateConfiguration(roomStatusChangeEnabled, historySize);
+
+        System.out.println("Hotel configuration updated");
+    }
+
+    private void editRoomConfig() {
+        System.out.println("\n=== Edit Room Configuration ===");
+        System.out.println("Room configuration editing not implemented yet.");
+        // TODO: Implement room configuration editing
+    }
+
+    private void editServiceConfig() {
+        System.out.println("\n=== Edit Service Configuration ===");
+        System.out.println("Service configuration editing not implemented yet.");
+        // TODO: Implement service configuration editing
+    }
+
+    // Helper method to get boolean input
+    private boolean getBooleanInput(String prompt) {
+        System.out.print(prompt);
+        String input = scanner.nextLine().toLowerCase();
+        return input.equals("y") || input.equals("yes") || input.equals("true") || input.equals("1");
+    }
 
     private void showSortedRoomsMenu() {
         System.out.println("\n--- Sort Rooms By ---");
